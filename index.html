@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Crawler Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+<header class="header">
+    <div class="container">
+        <h1> Web Crawler Dashboard</h1>
+        <p>Hierarchical web crawler with depth-first traversal </p>
+    </div>
+</header>
+
+<!-- Main Container -->
+<div class="container">
+
+    <!-- Create new Crawl Job Section -->
+    <section class="card">
+        <h2>Create new Crawl job</h2>
+
+        <form id="createJobForm">
+            <div class="form-group">
+                <label for="startUrl">Start URL *</label>
+                <input
+                        type="url"
+                        id="startUrl"
+                        required
+                        placeholder="https://example.com"
+                >
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="maxDepth">Max Depth *</label>
+                    <input
+                            type="number"
+                            id="maxDepth"
+                            required
+                            min="0"
+                            max="10"
+                            value="2"
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="crawlScope">Crawl Scope</label>
+                    <select id="crawlScope">
+                        <option value="SAME_DOMAIN">Same Domain Only</option>
+                        <option value="INCLUDE_SUBDOMAINS">Include Subdomains</option>
+                        <option value="ALL_LINKS">All Links</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="checkbox-label"></label>
+                <input
+                        type="checkbox"
+                        id="respectRobotsTxt"
+                        checked>
+                Respect robots.txt
+
+            </div>
+            <button type="submit" class="btn btn-primary">
+                Start crawling! :)
+            </button>
+        </form>
+    </section>
+
+
+    <!-- Crawl Jobs List Section -->
+    <section class="card">
+        <div class="section-header">
+            <h2>Crawl Jobs</h2>
+            <button class="btn btn-secondary" onclick="app.refreshJobs()">Refresh!</button>
+        </div>
+
+        <div id="jobsContainer" class="jobs-container">
+            <p class="loading">Loading jobs...</p>
+            <!-- Jobs will be dynamically populated here -->
+        </div>
+    </section>
+</div>
+
+<!-- Job Details Modal -->
+<div id="detailsModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="app.closeModal()">&times;</span>
+        <div id="modalBody">
+            <!-- Job details will be dynamically populated here -->
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="toast"></div>
+
+<!-- JavaScript Files -->
+<script src="js/api.js"></script>
+<script src="js/app.js"></script>
+<script src="js/components.js"></script>
+
+</body>
+</html>
