@@ -8,9 +8,10 @@ const Components = (() => {
      * Create a job card element
      */
     function jobCard(job) {
-        const statusClass = 'status-${job.status}';
-        const canStart = job.status ==='PENDING';
+        const statusClass = `status-${job.status}`;
+        const canStart = job.status === 'PENDING';
         const canViewResults = job.status === 'COMPLETED';
+        const canClassify = job.status === 'COMPLETED'; // NY: Kan klassificere hvis completed
 
         return `
             <div class="job-card">
@@ -57,6 +58,11 @@ const Components = (() => {
                             ▶️ Start
                         </button>
                     ` : ''}
+                    ${canClassify ? `
+                        <button class="btn btn-primary btn-small" onclick="app.classifyJob(${job.id})">
+                            🤖 Klassificér
+                        </button>
+                    ` : ''}
                     ${canViewResults ? `
                         <button class="btn btn-primary btn-small" onclick="app.viewResults(${job.id})">
                             📊 View Results
@@ -75,10 +81,11 @@ const Components = (() => {
             </div>
         `;
     }
+
     /**
      * Create job details modal content
      */
-    function jobDetailsModal(job, pages, stats) {
+    function jobDetailsModal(job, pages, stats, classificationStats = null) {
         return `
             <h2>Job #${job.id} Results</h2>
             <p style="color: var(--secondary); margin-bottom: 2rem;">
@@ -99,11 +106,74 @@ const Components = (() => {
                     <div class="stat-value">${stats.failedPages}</div>
                     <div class="stat-label">Failed</div>
                 </div>
+                ${classificationStats ? `
+                <div class="stat-card">
+                    <div class="stat-value">${classificationStats.analyzedPages}</div>
+                    <div class="stat-label">AI Analyzed</div>
+                </div>
+                ` : ''}
+            </div>
+
+            <!-- AI Classification Stats (hvis tilgængelig) -->
+            ${classificationStats && classificationStats.categoryBreakdown ? `
+                <div style="margin: 2rem 0;">
+                    <h3>AI Kategorier</h3>
+                    <div class="category-breakdown">
+                        ${Object.entries(classificationStats.categoryBreakdown)
+            .map(([category, count]) => `
+                                <div class="category-item" onclick="app.filterByCategory(${job.id}, '${category}')">
+                                    <span class="category-badge category-${category}">${category}</span>
+                                    <span class="category-count">${count}</span>
+                                </div>
+                            `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+
+            <!-- Visualization Container -->
+            <div style="margin: 2rem 0;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                    <div style="display: flex; gap: 0.5rem;">
+                        <h3 style="margin: 0;">Visualization</h3>
+                        <button id="networkViewBtn" onclick="app.switchView('network', ${job.id})" class="btn btn-secondary btn-small view-toggle-btn active">
+                            🔷 Network
+                        </button>
+                        <button id="treeViewBtn" onclick="app.switchView('tree', ${job.id})" class="btn btn-secondary btn-small view-toggle-btn">
+                            🌳 Tree
+                        </button>
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button onclick="Visualization.exportSVG()" class="btn btn-secondary btn-small">
+                            📊 SVG
+                        </button>
+                        <button onclick="Visualization.exportPNG()" class="btn btn-secondary btn-small">
+                            🖼️ PNG
+                        </button>
+                        <button onclick="Visualization.exportJPEG()" class="btn btn-secondary btn-small">
+                            📷 JPEG
+                        </button>
+                        <button onclick="API.exportGraphML(${job.id})" class="btn btn-success btn-small">
+                            📄 GraphML
+                        </button>
+                        <button onclick="API.exportXML(${job.id})" class="btn btn-success btn-small">
+                            📋 XML
+                        </button>
+                        <button onclick="API.exportSitemap(${job.id})" class="btn btn-success btn-small">
+                            🗺️ Sitemap
+                        </button>
+                    </div>
+                </div>
+                <div id="graph-container" style="border: 2px solid #e5e7eb; border-radius: 8px; overflow: hidden;"></div>
             </div>
 
             <!-- Pages List -->
-            <h3 style="margin-top: 2rem; margin-bottom: 1rem;">Crawled Pages</h3>
-            <div class="page-list">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h3 style="margin: 0;">Crawled Pages</h3>
+                <button id="clearFilterBtn" onclick="app.clearCategoryFilter(${job.id})" class="btn btn-secondary btn-small" style="display: none;">
+                    ❌ Clear Filter
+                </button>
+            </div>
+            <div class="page-list" id="pagesList">
                 ${pages.map(page => pageItem(page)).join('')}
             </div>
         `;
@@ -117,17 +187,25 @@ const Components = (() => {
 
         return `
             <div class="page-item ${statusClass}">
-                <div class="page-title">
-                    ${page.title || 'No Title'}
+                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                    <div class="page-title">
+                        ${page.title || 'No Title'}
+                    </div>
+                    ${page.category ? `
+                        <span class="category-badge category-${page.category}">
+                            ${page.category}
+                        </span>
+                    ` : ''}
                 </div>
                 <a href="${page.url}" target="_blank" class="page-url">
                     ${page.url}
                 </a>
                 <div class="page-meta">
-                    <span>Level: ${page.hierarchyLevel}</span>
+                    <span>Level: ${page.hieraxyLevel}</span>
                     <span>Status: ${page.httpStatusCode || 'N/A'}</span>
                     <span>Links: ${page.outgoingLinksCount}</span>
                     ${page.contentType ? `<span>Type: ${page.contentType}</span>` : ''}
+                    ${page.aiAnalyzed ? `<span>✅ AI Analyzed</span>` : ''}
                 </div>
                 ${page.errorMessage ? `
                     <div style="margin-top: 0.5rem; color: var(--danger); font-size: 0.875rem;">
@@ -159,50 +237,3 @@ const Components = (() => {
         formatDate
     };
 })();
-
-function jobDetailsModal(job, pages, stats) {
-    return `
-        <h2>Job #${job.id} Results</h2>
-        
-        <!-- Stats -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-value">${stats.totalPages}</div>
-                <div class="stat-label">Total Pages</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">${stats.successfulPages}</div>
-                <div class="stat-label">Successful</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-value">${stats.failedPages}</div>
-                <div class="stat-label">Failed</div>
-            </div>
-        </div>
-
-        <!-- Visualization Container -->
-        <div style="margin: 2rem 0;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                <h3>Network Visualization</h3>
-                <div style="display: flex; gap: 0.5rem;">
-                    <button onclick="Visualization.exportSVG()" class="btn btn-secondary btn-small">
-                        📊 Export SVG
-                    </button>
-                    <button onclick="Visualization.exportPNG()" class="btn btn-secondary btn-small">
-                        🖼️ Export PNG
-                    </button>
-                    <button onclick="Visualization.exportJPEG()" class="btn btn-secondary btn-small">
-                        📷 Export JPEG
-                    </button>
-                </div>
-            </div>
-            <div id="graph-container" style="border: 2px solid #e5e7eb; border-radius: 8px; overflow: hidden;"></div>
-        </div>
-
-        <!-- Pages List -->
-        <h3>Crawled Pages</h3>
-        <div class="page-list">
-            ${pages.map(page => pageItem(page)).join('')}
-        </div>
-    `;
-}

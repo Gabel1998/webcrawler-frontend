@@ -2,14 +2,14 @@
  * API Module - Handles all backend communication
  */
 const API = (() => {
-    const BASE_URL = 'http://localhost:8080/api';  // ✅ http not https
+    const BASE_URL = 'http://localhost:8080/api';
 
     /**
      * Generic fetch wrapper with error handling
      */
     async function fetchAPI(endpoint, options = {}) {
         try {
-            const response = await fetch(`${BASE_URL}${endpoint}`, {  // ✅ Fixed: backticks and endpoint
+            const response = await fetch(`${BASE_URL}${endpoint}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     ...options.headers
@@ -102,6 +102,61 @@ const API = (() => {
          */
         async getGraphData(jobId) {
             return fetchAPI(`/crawl-jobs/${jobId}/results/graph-data`);
+        },
+
+        /**
+         * Get tree data for a job
+         */
+        async getTreeData(jobId) {
+            return fetchAPI(`/crawl-jobs/${jobId}/results/tree-data`);
+        },
+
+        /**
+         * Export as GraphML XML
+         */
+        exportGraphML(jobId) {
+            window.open(`${BASE_URL}/crawl-jobs/${jobId}/results/export/graphml`, '_blank');
+        },
+
+        /**
+         * Export as Hierarchical XML
+         */
+        exportXML(jobId) {
+            window.open(`${BASE_URL}/crawl-jobs/${jobId}/results/export/xml`, '_blank');
+        },
+
+        /**
+         * Export as Sitemap XML
+         */
+        exportSitemap(jobId) {
+            window.open(`${BASE_URL}/crawl-jobs/${jobId}/results/export/sitemap`, '_blank');
+        },
+
+        // ============================================
+        // NYE AI KLASSIFICERING ENDPOINTS
+        // ============================================
+
+        /**
+         * Start AI klassificering af et crawl job
+         */
+        async classifyJob(jobId) {
+            return fetchAPI(`/crawl-jobs/${jobId}/classify`, {
+                method: 'POST'
+            });
+        },
+
+        /**
+         * Hent AI klassificerings statistik
+         */
+        async getClassificationStats(jobId) {
+            return fetchAPI(`/crawl-jobs/${jobId}/classification-stats`);
+        },
+
+        /**
+         * Hent sider filtreret efter kategori
+         */
+        async getPagesByCategory(jobId, category) {
+            return fetchAPI(`/crawl-jobs/${jobId}/results/pages?category=${category}`);
         }
     };
 })();

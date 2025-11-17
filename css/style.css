@@ -460,3 +460,126 @@ select:focus {
         margin-top: 1rem;
     }
 }
+
+/* ===== VIEW TOGGLE BUTTONS ===== */
+.view-toggle-btn {
+    transition: all 0.2s;
+}
+
+.view-toggle-btn.active {
+    background: var(--primary);
+    color: white;
+}
+
+.view-toggle-btn:not(.active):hover {
+    background: var(--gray-300);
+}
+
+/* ===== TREE VISUALIZATION STYLES ===== */
+.tree-node circle {
+    transition: all 0.3s;
+}
+
+.tree-node:hover circle {
+    r: 10%;
+    filter: brightness(1.2);
+}
+
+.tree-link {
+    transition: stroke-width 0.3s;
+}
+
+/* ===== GRAPH TOOLTIP ===== */
+.graph-tooltip {
+    z-index: 10000;
+    max-width: 300px;
+    word-wrap: break-word;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+/* ===== AI CATEGORY BADGES ===== */
+.category-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.category-PRODUCT {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.category-CATEGORY {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.category-INFORMATION {
+    background: #e8f5e9;
+    color: #388e3c;
+}
+
+.category-BLOG {
+    background: #fff3e0;
+    color: #f57c00;
+}
+
+.category-CONTACT {
+    background: #fce4ec;
+    color: #c2185b;
+}
+
+.category-JOB {
+    background: #e0f2f1;
+    color: #00796b;
+}
+
+.category-LEGAL {
+    background: #f1f8e9;
+    color: #689f38;
+}
+
+.category-HOME {
+    background: #fff9c4;
+    color: #f9a825;
+}
+
+.category-UNKNOWN {
+    background: #eceff1;
+    color: #607d8b;
+}
+
+/* ===== CATEGORY BREAKDOWN ===== */
+.category-breakdown {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.category-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--gray-50);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.category-item:hover {
+    background: var(--gray-100);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.category-count {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--gray-700);
+}
