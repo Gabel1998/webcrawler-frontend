@@ -2,7 +2,7 @@
  * API Module - Handles all backend communication
  */
 const API = (() => {
-    const BASE_URL = 'http://localhost:8080/api';
+    const BASE_URL = window.location.origin + (window.location.pathname.startsWith('/webcrawler') ? '/webcrawler' : '') + '/api';
 
     /**
      * Generic fetch wrapper with error handling

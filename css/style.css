@@ -583,3 +583,37 @@ select:focus {
     font-weight: 700;
     color: var(--gray-700);
 }
+
+/* ===== SHOWROOM BANNER ===== */
+.showroom-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    padding: 0.6rem 1.2rem;
+    border-bottom: 2px solid var(--primary);
+}
+
+.showroom-banner__link {
+    color: #93c5fd;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.showroom-banner__link:hover {
+    color: #fff;
+}
+
+.showroom-banner__label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #60a5fa;
+    background: rgba(37, 99, 235, 0.15);
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    border: 1px solid rgba(37, 99, 235, 0.3);
+}
