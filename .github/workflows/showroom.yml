@@ -9,7 +9,8 @@ permissions:
   packages: write
 
 jobs:
-  build-and-push:
+  push-images:
+    name: Build, Scan & Push
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,3 +30,10 @@ jobs:
           tags: |
             ghcr.io/gabel1998/webcrawler/frontend:showroom
             ghcr.io/gabel1998/webcrawler/frontend:showroom-${{ github.sha }}
+
+      - name: Scan image for vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ghcr.io/gabel1998/webcrawler/frontend:showroom-${{ github.sha }}
+          format: table
+          severity: CRITICAL,HIGH
